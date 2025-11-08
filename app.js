@@ -559,25 +559,26 @@ renderRephrasing(exercise, currentAnswer) {
     }
 
     showFeedback(isCorrect, exercise, answer) {
-        const feedbackContainer = document.getElementById('feedbackContainer');
-        const feedback = this.generateFeedback(isCorrect, exercise, answer);
+    const feedbackContainer = document.getElementById('feedbackContainer');
+    const feedback = this.generateFeedback(isCorrect, exercise, answer);
 
-        feedbackContainer.innerHTML = `
-            <div class="feedback show ${isCorrect ? 'correct' : 'incorrect'}">
-                <div class="feedback-header">
-                    <span class="feedback-icon">${isCorrect ? '✓' : '✗'}</span>
-                    <span>${isCorrect ? 'CORRECT!' : 'INCORRECT'}</span>
-                </div>
-                <div class="feedback-text">${feedback}</div>
-                <div class="feedback-buttons">
-                    <button class="btn-nav btn-prev" ${this.state.currentQuestion === 0 ? 'disabled' : ''} onclick="app.previousQuestion()">← Previous</button>
-                    <button class="btn-nav btn-next" ${this.state.currentQuestion === 49 ? 'disabled' : ''} onclick="app.nextQuestion()">Next →</button>
-                </div>
+    feedbackContainer.innerHTML = `
+        <div class="feedback show ${isCorrect ? 'correct' : 'incorrect'}">
+            <div class="feedback-header">
+                <span class="feedback-icon">${isCorrect ? '✓' : '✗'}</span>
+                <span>${isCorrect ? 'CORRECT!' : 'INCORRECT'}</span>
             </div>
-        `;
+            <div class="feedback-text">${feedback}</div>
+            <div class="feedback-buttons">
+                <button class="btn-nav btn-prev" ${this.state.currentQuestion === 0 ? 'disabled' : ''} onclick="app.previousQuestion()">← Previous</button>
+                <button class="btn-nav btn-next" onclick="app.nextQuestion()">Next →</button>
+            </div>
+        </div>
+    `;
 
-        feedbackContainer.scrollIntoView({ behavior: 'smooth' });
-    }
+    feedbackContainer.scrollIntoView({ behavior: 'smooth' });
+}
+
 
     renderPreviousFeedback() {
     const currentAnswer = this.state.answers[this.state.currentQuestion];
