@@ -1,7 +1,7 @@
 // Relative Clauses Learning App - Main Application
 // Google Sheets Integration - Permanent Leaderboard
 
-const GOOGLE_SHEETS_URL = 'REEMPLAZA_CON_TU_URL'; // Tu URL de Google Apps Script
+const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbykQRM34b5hHS4xBlKuPyUJr_BAf2QS-rKlDcPmrntbNCOfyBL51usULV9bGL1C4kRV0w/exec'; // Tu URL de Google Apps Script
 
 class RelativeClausesApp {
     constructor() {
