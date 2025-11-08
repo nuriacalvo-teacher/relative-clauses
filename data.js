@@ -115,7 +115,7 @@ const exercisesData = [
     { type: 'multipleChoice', question: 'The restaurant, ___ serves Italian food, is near my house.', options: ['who', 'which', 'that', 'why'], correct: ['which'] },
     { type: 'multipleChoice', question: 'I don\'t know the reason ___ he decided to leave.', options: ['who', 'where', 'why', 'when'], correct: ['why'] },
     { type: 'multipleChoice', question: 'The girl ___ backpack is this must be very organized.', options: ['whose', 'who', 'which', 'what'], correct: ['whose'] },
-    { type: 'multipleChoice', question: 'The day ___ I met you was special.', options: ['what', 'where', 'why', '-'], correct: ['-'] },
+    { type: 'multipleChoice', question: 'The day ___ I met you was special.', options: ['what', 'where', 'when', '-'], correct: ['-'] },
 
     // Fill in the Gaps (10-29)
     { type: 'fillInGaps', sentence: 'The woman ___ is waiting outside is my sister.', correct: ['who'] },
