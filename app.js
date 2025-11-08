@@ -196,21 +196,28 @@ class RelativeClausesApp {
         `;
     }
 
-    renderExerciseNavigation() {
-        return `
-            <div class="exercise-navigation">
-                <button class="jump-link ${this.state.currentQuestion < 10 ? 'active' : ''}" onclick="app.jumpTo(0)">
-                    Jump to Multiple Choice (Q1-10)
-                </button>
-                <button class="jump-link ${this.state.currentQuestion >= 10 && this.state.currentQuestion < 30 ? 'active' : ''}" onclick="app.jumpTo(10)">
-                    Jump to Fill in the Gaps (Q11-30)
-                </button>
-                <button class="jump-link ${this.state.currentQuestion >= 30 ? 'active' : ''}" onclick="app.jumpTo(30)">
-                    Jump to Rephrasing (Q31-50)
-                </button>
-            </div>
-        `;
-    }
+	
+ renderExerciseNavigation() {
+    // Encontrar el primer ejercicio sin responder en cada sección
+    const firstUnansweredMC = this.getFirstUnansweredInSection(0, 10);
+    const firstUnansweredFG = this.getFirstUnansweredInSection(10, 30);
+    const firstUnansweredRP = this.getFirstUnansweredInSection(30, 50);
+
+    return `
+        <div class="exercise-navigation">
+            <button class="jump-link ${this.state.currentQuestion < 10 ? 'active' : ''}" onclick="app.jumpTo(${firstUnansweredMC})">
+                Jump to Multiple Choice (Q1-10)
+            </button>
+            <button class="jump-link ${this.state.currentQuestion >= 10 && this.state.currentQuestion < 30 ? 'active' : ''}" onclick="app.jumpTo(${firstUnansweredFG})">
+                Jump to Fill in the Gaps (Q11-30)
+            </button>
+            <button class="jump-link ${this.state.currentQuestion >= 30 ? 'active' : ''}" onclick="app.jumpTo(${firstUnansweredRP})">
+                Jump to Rephrasing (Q31-50)
+            </button>
+        </div>
+    `;
+}
+
 
     renderCurrentExercise() {
         const currentExercise = this.getCurrentExercise();
@@ -556,6 +563,17 @@ class RelativeClausesApp {
     goToExercises() {
         this.setState({ currentScreen: 'exercises' });
     }
+
+	getFirstUnansweredInSection(start, end) {
+    for (let i = start; i < end; i++) {
+        // Si no hay respuesta, o la respuesta es incorrecta, retorna ese índice
+        if (!this.state.answers[i] || !this.state.answers[i].correct) {
+            return i;
+        }
+    }
+    // Si todo está respondido, retorna el último de la sección
+    return end - 1;
+	}
 
     jumpTo(questionIndex) {
         this.setState({ currentQuestion: questionIndex });
