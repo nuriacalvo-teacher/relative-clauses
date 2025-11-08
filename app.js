@@ -735,13 +735,24 @@ renderRephrasing(exercise, currentAnswer) {
 }
 
 nextQuestion() {
-    if (this.state.currentQuestion < 49) {
-        let nextQuestion = this.state.currentQuestion + 1;
-        // Si la siguiente pregunta ya está respondida, salta a la siguiente sin responder
+    const currentQ = this.state.currentQuestion;
+
+    // Si estamos en la pregunta 49 (la última), ir a resultados
+    if (currentQ === 49) {
+        this.setState({ currentScreen: 'finalResults' });
+        return;
+    }
+
+    // Si estamos antes de la 49, avanzar
+    if (currentQ < 49) {
+        let nextQuestion = currentQ + 1;
+
+        // Saltar preguntas ya respondidas
         while (nextQuestion < 50 && this.state.answers[nextQuestion] !== undefined) {
             nextQuestion++;
         }
-        // Si llegó al final, ir a resultados finales
+
+        // Si llegamos al final, ir a resultados
         if (nextQuestion >= 50) {
             this.setState({ currentScreen: 'finalResults' });
         } else {
@@ -750,10 +761,9 @@ nextQuestion() {
                 showPreviousFeedback: false
             });
         }
-    } else {
-        this.setState({ currentScreen: 'finalResults' });
     }
 }
+
 
     tryAgain() {
         this.setState({
