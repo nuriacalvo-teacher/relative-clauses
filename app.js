@@ -2,24 +2,26 @@
 
 class RelativeClausesApp {
     constructor() {
-        this.state = {
-            student: {
-                firstName: '',
-                lastName: '',
-                course: ''
-            },
-            currentScreen: 'login',
-            currentQuestion: 0,
-            answers: [],
-            scores: {
-                multipleChoice: 0,
-                fillInGaps: 0,
-                rephrasing: 0
-            }
-        };
+    this.state = {
+        student: {
+            firstName: '',
+            lastName: '',
+            course: ''
+        },
+        currentScreen: 'login',
+        currentQuestion: 0,
+        answers: [],
+        showPreviousFeedback: false,
+        scores: {
+            multipleChoice: 0,
+            fillInGaps: 0,
+            rephrasing: 0
+        }
+    };
 
-        this.init();
-    }
+    this.init();
+}
+
 
     init() {
   	  this.shuffleExercises();
@@ -142,27 +144,30 @@ class RelativeClausesApp {
     }
 
     renderExercises() {
-        const currentExercise = this.getCurrentExercise();
-        const progressPercent = (this.state.currentQuestion / 50) * 100;
+    const currentExercise = this.getCurrentExercise();
+    const progressPercent = (this.state.currentQuestion / 50) * 100;
 
-        return `
-            ${this.renderHeader(true)}
-            <main>
-                <div class="exercises-container">
-                    ${this.renderScorePanel()}
-                    <div class="progress-bar">
-                        <div class="progress-bar-fill" style="width: ${progressPercent}%"></div>
-                    </div>
-                    <div class="question-counter">Question ${this.state.currentQuestion + 1} of 50</div>
-                    ${this.renderExerciseNavigation()}
-                    <div class="exercise">
-                        ${this.renderCurrentExercise()}
-                    </div>
-                    <div id="feedbackContainer"></div>
+    return `
+        ${this.renderHeader(true)}
+        <main>
+            <div class="exercises-container">
+                ${this.renderScorePanel()}
+                <div class="progress-bar">
+                    <div class="progress-bar-fill" style="width: ${progressPercent}%"></div>
                 </div>
-            </main>
-        `;
-    }
+                <div class="question-counter">Question ${this.state.currentQuestion + 1} of 50</div>
+                ${this.renderExerciseNavigation()}
+                <div class="exercise">
+                    ${this.renderCurrentExercise()}
+                </div>
+                <div id="feedbackContainer">
+                    ${this.state.showPreviousFeedback ? this.renderPreviousFeedback() : ''}
+                </div>
+            </div>
+        </main>
+    `;
+}
+
 
     renderScorePanel() {
         const mcScore = this.calculateSectionScore('multipleChoice');
@@ -524,6 +529,32 @@ renderRephrasing(exercise, currentAnswer) {
         feedbackContainer.scrollIntoView({ behavior: 'smooth' });
     }
 
+    renderPreviousFeedback() {
+    const currentAnswer = this.state.answers[this.state.currentQuestion];
+    const currentExercise = this.getCurrentExercise();
+    
+    if (!currentAnswer) {
+        return '';
+    }
+    
+    const feedback = this.generateFeedback(currentAnswer.correct, currentExercise, currentAnswer.text);
+    
+    return `
+        <div class="feedback show ${currentAnswer.correct ? 'correct' : 'incorrect'}">
+            <div class="feedback-header">
+                <span class="feedback-icon">${currentAnswer.correct ? '✓' : '✗'}</span>
+                <span>${currentAnswer.correct ? 'CORRECT!' : 'INCORRECT'}</span>
+            </div>
+            <div class="feedback-text">${feedback}</div>
+            <div class="feedback-buttons">
+                <button class="btn-nav btn-prev" ${this.state.currentQuestion === 0 ? 'disabled' : ''} onclick="app.previousQuestion()">← Previous</button>
+                <button class="btn-nav btn-next" ${this.state.currentQuestion === 49 ? 'disabled' : ''} onclick="app.nextQuestion()">Next →</button>
+            </div>
+        </div>
+    `;
+}
+
+	
     generateFeedback(isCorrect, exercise, answer) {
         if (isCorrect) {
             return 'Great job! Your answer is correct.';
@@ -592,40 +623,25 @@ renderRephrasing(exercise, currentAnswer) {
 
 	previousQuestion() {
     if (this.state.currentQuestion > 0) {
-        this.setState({ currentQuestion: this.state.currentQuestion - 1 });
-        // Mostrar corrección y deshabilitar Inputs al volver atrás
-        setTimeout(() => {
-            const submitBtn = document.querySelector('.submit-btn');
-            if (submitBtn) submitBtn.disabled = true;
-
-            // Mostrar el feedback de la respuesta guardada
-            const idx = this.state.currentQuestion;
-            const currentAnswer = this.state.answers[idx];
-            const currentExercise = this.getCurrentExercise();
-            if (currentAnswer) {
-                this.showFeedback(currentAnswer.correct, currentExercise, currentAnswer.text);
-            } else {
-                const feedbackContainer = document.getElementById('feedbackContainer');
-                if (feedbackContainer) feedbackContainer.innerHTML = '';
-            }
-        }, 0);
+        // Primero actualizar el estado y marcar que venimos de previous
+        this.setState({ 
+            currentQuestion: this.state.currentQuestion - 1,
+            showPreviousFeedback: true
+        });
     }
 }
 
 nextQuestion() {
     if (this.state.currentQuestion < 49) {
-        this.setState({ currentQuestion: this.state.currentQuestion + 1 });
-        // Habilitar input y botón para nueva pregunta, limpiar feedback
-        setTimeout(() => {
-            const submitBtn = document.querySelector('.submit-btn');
-            if (submitBtn) submitBtn.disabled = false;
-            const feedbackContainer = document.getElementById('feedbackContainer');
-            if (feedbackContainer) feedbackContainer.innerHTML = '';
-        }, 0);
+        this.setState({ 
+            currentQuestion: this.state.currentQuestion + 1,
+            showPreviousFeedback: false
+        });
     } else {
         this.setState({ currentScreen: 'results' });
     }
 }
+
 
 
     tryAgain() {
