@@ -1,4 +1,7 @@
 // Relative Clauses Learning App - Main Application
+// Google Sheets Integration - Permanent Leaderboard
+
+const GOOGLE_SHEETS_URL = 'REEMPLAZA_CON_TU_URL'; // Tu URL de Google Apps Script
 
 class RelativeClausesApp {
     constructor() {
@@ -16,7 +19,6 @@ class RelativeClausesApp {
         password: 'nuriaLEGEND',
         startTime: null,
         leaderboard: [],
-        leaderboardResetDate: null,
         scores: {
             multipleChoice: 0,
             fillInGaps: 0,
@@ -31,7 +33,6 @@ class RelativeClausesApp {
     init() {
   	  this.shuffleExercises();
           this.loadLeaderboard();
-          this.checkLeaderboardReset();
           this.render();
 }
 
@@ -335,7 +336,6 @@ renderRephrasing(exercise, currentAnswer) {
 
         const passed = totalPercent >= 80;
 
-        // Calcular tiempo y guardar en ranking
         const endTime = Date.now();
         const timeSpent = Math.floor((endTime - this.state.startTime) / 1000);
         this.saveToLeaderboard(totalScore, timeSpent);
@@ -399,16 +399,15 @@ renderRephrasing(exercise, currentAnswer) {
 
     renderLeaderboard() {
         const entries = this.state.leaderboard.slice(0, 10);
-        const nextResetDate = this.getNextResetDate();
 
         return `
             ${this.renderHeader(true)}
             <main>
                 <div style="padding: 20px; max-width: 900px; margin: 0 auto;">
                     <h1 style="text-align: center; margin-bottom: 10px;">🏆 Top 10 Rankings 🏆</h1>
-                    <div style="background-color: #fef3c7; border: 2px solid #f59e0b; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
-                        <p style="margin: 0; font-weight: bold; color: #92400e;">
-                            📅 This ranking will reset on: <strong>${nextResetDate}</strong>
+                    <div style="background-color: #ecfdf5; border: 2px solid #10b981; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
+                        <p style="margin: 0; font-weight: bold; color: #047857;">
+                            📊 All-time rankings (permanent records)
                         </p>
                     </div>
 
@@ -490,7 +489,6 @@ renderRephrasing(exercise, currentAnswer) {
 
     this.state.answers = newAnswers;
 
-    // Deshabilitar el botón Submit
     const submitBtn = document.querySelector('.submit-btn');
     if (submitBtn) submitBtn.disabled = true;
 
@@ -507,7 +505,6 @@ renderRephrasing(exercise, currentAnswer) {
            	 this.normalizeAnswer(correct) === normalized
         	);
  	   } else {
-     	   // Rephrasing: preserve commas in validation
      	   const normalized = this.normalizeAnswerRephrasing(answer);
     	    return exercise.correct.some(correct => 
     	        this.normalizeAnswerRephrasing(correct) === normalized
@@ -522,7 +519,6 @@ renderRephrasing(exercise, currentAnswer) {
      	   .replace(/  +/g, ' ');
 	}
 	normalizeAnswerRephrasing(text) {
-    // For rephrasing: keep commas but remove final punctuation
     return text.toLowerCase()
         .replace(/[.!?;:]+$/, '')
         .replace(/[^a-z0-9 ,]/g, '')
@@ -648,25 +644,22 @@ renderRephrasing(exercise, currentAnswer) {
     }
 
     loadLeaderboard() {
-        const saved = localStorage.getItem('leaderboard');
-        const resetDate = localStorage.getItem('leaderboardResetDate');
-
-        this.state.leaderboard = saved ? JSON.parse(saved) : [];
-        this.state.leaderboardResetDate = resetDate ? new Date(resetDate) : new Date();
-    }
-
-    checkLeaderboardReset() {
-        const resetDate = this.state.leaderboardResetDate;
-        const now = new Date();
-        const timeDiff = now - resetDate;
-        const daysElapsed = timeDiff / (1000 * 60 * 60 * 24);
-
-        if (daysElapsed >= 7) {
-            this.state.leaderboard = [];
-            this.state.leaderboardResetDate = new Date();
-            localStorage.setItem('leaderboard', JSON.stringify([]));
-            localStorage.setItem('leaderboardResetDate', new Date().toISOString());
-        }
+        // Cargar desde Google Sheets
+        fetch(GOOGLE_SHEETS_URL)
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.length > 0) {
+                    this.state.leaderboard = data.sort((a, b) => b.score - a.score || a.timeSpent - b.timeSpent).slice(0, 10);
+                }
+                this.render();
+            })
+            .catch(err => {
+                console.log('Google Sheets no disponible, usando local');
+                // Si falla, usar localStorage como respaldo
+                const saved = localStorage.getItem('leaderboard');
+                this.state.leaderboard = saved ? JSON.parse(saved) : [];
+                this.render();
+            });
     }
 
     saveToLeaderboard(totalScore, timeSpent) {
@@ -679,18 +672,23 @@ renderRephrasing(exercise, currentAnswer) {
             date: new Date().toLocaleDateString()
         };
 
-        const leaderboard = [...this.state.leaderboard, newEntry]
-            .sort((a, b) => b.score - a.score || a.timeSpent - b.timeSpent)
-            .slice(0, 10);
-
-        this.state.leaderboard = leaderboard;
-        localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
-    }
-
-    getNextResetDate() {
-        const resetDate = new Date(this.state.leaderboardResetDate);
-        const nextReset = new Date(resetDate.getTime() + 7 * 24 * 60 * 60 * 1000);
-        return nextReset.toLocaleDateString();
+        // Enviar a Google Sheets
+        fetch(GOOGLE_SHEETS_URL, {
+            method: 'POST',
+            body: JSON.stringify(newEntry)
+        }).then(() => {
+            console.log('Resultado guardado en Google Sheets');
+            // Recargar leaderboard
+            setTimeout(() => this.loadLeaderboard(), 500);
+        }).catch(err => {
+            console.log('Error al guardar en Google Sheets, usando local');
+            // Guardar localmente como respaldo
+            const leaderboard = [...this.state.leaderboard, newEntry]
+                .sort((a, b) => b.score - a.score || a.timeSpent - b.timeSpent)
+                .slice(0, 10);
+            this.state.leaderboard = leaderboard;
+            localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
+        });
     }
 
     showLeaderboard() {
@@ -737,22 +735,18 @@ renderRephrasing(exercise, currentAnswer) {
 nextQuestion() {
     const currentQ = this.state.currentQuestion;
 
-    // Si estamos en la pregunta 49 (la última), ir a resultados
     if (currentQ === 49) {
         this.setState({ currentScreen: 'finalResults' });
         return;
     }
 
-    // Si estamos antes de la 49, avanzar
     if (currentQ < 49) {
         let nextQuestion = currentQ + 1;
 
-        // Saltar preguntas ya respondidas
         while (nextQuestion < 50 && this.state.answers[nextQuestion] !== undefined) {
             nextQuestion++;
         }
 
-        // Si llegamos al final, ir a resultados
         if (nextQuestion >= 50) {
             this.setState({ currentScreen: 'finalResults' });
         } else {
