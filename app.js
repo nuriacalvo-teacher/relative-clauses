@@ -13,7 +13,7 @@ class RelativeClausesApp {
         answers: [],
         showPreviousFeedback: false,
         isAuthenticated: false,
-        password: 'IESGOYA2025',
+        password: 'nuriaLEGEND',
         startTime: null,
         leaderboard: [],
         leaderboardResetDate: null,
