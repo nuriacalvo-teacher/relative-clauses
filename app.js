@@ -66,8 +66,8 @@ class RelativeClausesApp {
                 app.innerHTML = this.renderExercises();
                 this.attachExerciseListeners();
                 break;
-            case 'results':
-                app.innerHTML = this.renderResults();
+            case 'finalResults':
+                app.innerHTML = this.renderFinalResults();
                 this.attachResultsListeners();
                 break;
             case 'leaderboard':
@@ -322,7 +322,7 @@ renderRephrasing(exercise, currentAnswer) {
 }
 
 
-    renderResults() {
+    renderFinalResults() {
         const mcScore = this.calculateSectionScore('multipleChoice');
         const fgScore = this.calculateSectionScore('fillInGaps');
         const rpScore = this.calculateSectionScore('rephrasing');
@@ -333,7 +333,7 @@ renderRephrasing(exercise, currentAnswer) {
         const rpPercent = Math.round((rpScore / 40) * 100);
         const totalPercent = Math.round((totalScore / 100) * 100);
 
-        const passed = mcPercent >= 90 && fgPercent >= 90 && rpPercent >= 90;
+        const passed = totalPercent >= 80;
 
         // Calcular tiempo y guardar en ranking
         const endTime = Date.now();
@@ -345,7 +345,7 @@ renderRephrasing(exercise, currentAnswer) {
             <main>
                 <div class="results-screen">
                     <div class="results-header">
-   			 <h1>${passed ? '🎉 Congratulations!' : 'Results'}</h1>
+   			 <h1>${passed ? '🎉 Congratulations! 🎉' : '📚 Keep Practicing! 📚'}</h1>
    			 <div class="student-header">
    		     <div class="student-name">${this.state.student.firstName} ${this.state.student.lastName}</div>
     		    <div class="student-course">${this.state.student.course}</div>
@@ -353,84 +353,38 @@ renderRephrasing(exercise, currentAnswer) {
 		</div>
 
                     <div class="results-scores">
-                        <div class="score-section ${mcPercent >= 90 ? 'passing' : 'failing'}">
-                            <div class="score-section-name">
-                                <span>${mcPercent >= 90 ? '✓' : '✗'}</span> Multiple Choice
-                            </div>
-                            <div class="score-section-detail">
-                                <div class="score-section-value">${mcScore}/20</div>
-                                <div class="score-section-percentage">${mcPercent}%</div>
-                            </div>
-                        </div>
-
-                        <div class="score-section ${fgPercent >= 90 ? 'passing' : 'failing'}">
-                            <div class="score-section-name">
-                                <span>${fgPercent >= 90 ? '✓' : '✗'}</span> Fill in the Gaps
-                            </div>
-                            <div class="score-section-detail">
-                                <div class="score-section-value">${fgScore}/40</div>
-                                <div class="score-section-percentage">${fgPercent}%</div>
-                            </div>
-                        </div>
-
-                        <div class="score-section ${rpPercent >= 90 ? 'passing' : 'failing'}">
-                            <div class="score-section-name">
-                                <span>${rpPercent >= 90 ? '✓' : '✗'}</span> Rephrasing
-                            </div>
-                            <div class="score-section-detail">
-                                <div class="score-section-value">${rpScore}/40</div>
-                                <div class="score-section-percentage">${rpPercent}%</div>
-                            </div>
-                        </div>
-
                         <div class="score-section" style="border-left-color: #3b82f6;">
-                            <div class="score-section-name">Total Score</div>
+                            <div class="score-section-name">Final Score</div>
                             <div class="score-section-detail">
                                 <div class="score-section-value">${totalScore}/100</div>
-                                <div class="score-section-percentage">${totalPercent}%</div>
+                                <div class="score-section-percentage" style="font-size: 32px; font-weight: bold; color: ${passed ? '#10b981' : '#ef4444'};">${totalPercent}%</div>
                             </div>
                         </div>
                     </div>
 
                     <div class="results-message ${passed ? 'passed' : 'failed'}">
                         ${passed ? `
-                            <h2>🎉 You PASSED! 🎉</h2>
-                            <p>Excellent work, ${this.state.student.firstName}!</p>
-                            <p>Please take a SCREENSHOT of this result and submit it through Google Classroom.</p>
-                            <div class="section-check">
-                                <span class="check-icon pass">✓</span>
-                                <span>Multiple Choice: ${mcPercent}%</span>
+                            <h2>🎉 Excellent Performance! 🎉</h2>
+                            <p style="font-size: 18px; margin: 20px 0;">You have achieved <strong>${totalPercent}%</strong> in the Relative Clauses test!</p>
+                            <p style="font-size: 16px; color: #666;">You have mastered relative clauses. Great job!</p>
+                            <div style="margin-top: 20px; padding: 15px; background-color: #ecfdf5; border-left: 4px solid #10b981; border-radius: 5px;">
+                                <p style="margin: 0; color: #047857;"><strong>📊 Detailed Results:</strong></p>
+                                <p style="margin: 5px 0; color: #047857;">Multiple Choice: ${mcPercent}%</p>
+                                <p style="margin: 5px 0; color: #047857;">Fill in the Gaps: ${fgPercent}%</p>
+                                <p style="margin: 5px 0; color: #047857;">Rephrasing: ${rpPercent}%</p>
                             </div>
-                            <div class="section-check">
-                                <span class="check-icon pass">✓</span>
-                                <span>Fill in the Gaps: ${fgPercent}%</span>
-                            </div>
-                            <div class="section-check">
-                                <span class="check-icon pass">✓</span>
-                                <span>Rephrasing: ${rpPercent}%</span>
-                            </div>
+                            <p style="margin-top: 20px; font-size: 14px; color: #999;">⏱️ Time spent: ${timeSpent}s</p>
                         ` : `
-                            <h2>Keep Trying!</h2>
-                            <p>You scored ${totalPercent}%, but you need 90% in EACH section to pass.</p>
-                            <div class="section-check">
-                                <span class="check-icon ${mcPercent >= 90 ? 'pass' : 'fail'}">
-                                    ${mcPercent >= 90 ? '✓' : '✗'}
-                                </span>
-                                <span>Multiple Choice: ${mcPercent}% ${mcPercent < 90 ? '(Need 90%)' : ''}</span>
+                            <h2>Keep Trying! 💪</h2>
+                            <p style="font-size: 18px; margin: 20px 0;">You scored <strong>${totalPercent}%</strong>, but you need <strong>80%</strong> to master this topic.</p>
+                            <p style="font-size: 16px; color: #666;">Review the theory and practice again to improve your understanding of relative clauses.</p>
+                            <div style="margin-top: 20px; padding: 15px; background-color: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 5px;">
+                                <p style="margin: 0; color: #92400e;"><strong>📊 Your Results:</strong></p>
+                                <p style="margin: 5px 0; color: #92400e;">Multiple Choice: ${mcPercent}%</p>
+                                <p style="margin: 5px 0; color: #92400e;">Fill in the Gaps: ${fgPercent}%</p>
+                                <p style="margin: 5px 0; color: #92400e;">Rephrasing: ${rpPercent}%</p>
                             </div>
-                            <div class="section-check">
-                                <span class="check-icon ${fgPercent >= 90 ? 'pass' : 'fail'}">
-                                    ${fgPercent >= 90 ? '✓' : '✗'}
-                                </span>
-                                <span>Fill in the Gaps: ${fgPercent}% ${fgPercent < 90 ? '(Need 90%)' : ''}</span>
-                            </div>
-                            <div class="section-check">
-                                <span class="check-icon ${rpPercent >= 90 ? 'pass' : 'fail'}">
-                                    ${rpPercent >= 90 ? '✓' : '✗'}
-                                </span>
-                                <span>Rephrasing: ${rpPercent}% ${rpPercent < 90 ? '(Need 90%)' : ''}</span>
-                            </div>
-                            <p style="margin-top: 20px;">Review the theory and try again. You can do it! 💪</p>
+                            <p style="margin-top: 20px; font-size: 14px; color: #999;">⏱️ Time spent: ${timeSpent}s</p>
                         `}
                     </div>
 
@@ -787,9 +741,9 @@ nextQuestion() {
         while (nextQuestion < 50 && this.state.answers[nextQuestion] !== undefined) {
             nextQuestion++;
         }
-        // Si llegó al final, ir a resultados
+        // Si llegó al final, ir a resultados finales
         if (nextQuestion >= 50) {
-            this.setState({ currentScreen: 'results' });
+            this.setState({ currentScreen: 'finalResults' });
         } else {
             this.setState({ 
                 currentQuestion: nextQuestion,
@@ -797,7 +751,7 @@ nextQuestion() {
             });
         }
     } else {
-        this.setState({ currentScreen: 'results' });
+        this.setState({ currentScreen: 'finalResults' });
     }
 }
 
