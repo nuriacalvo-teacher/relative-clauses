@@ -201,9 +201,8 @@ class RelativeClausesApp {
         `;
     }
 
-	
+
  renderExerciseNavigation() {
-    // Encontrar el primer ejercicio sin responder en cada sección
     const firstUnansweredMC = this.getFirstUnansweredInSection(0, 10);
     const firstUnansweredFG = this.getFirstUnansweredInSection(10, 30);
     const firstUnansweredRP = this.getFirstUnansweredInSection(30, 50);
@@ -269,10 +268,11 @@ renderFillInTheGaps(exercise, currentAnswer) {
 
 renderRephrasing(exercise, currentAnswer) {
     const answered = this.state.answers[this.state.currentQuestion] !== undefined;
+    const textValue = currentAnswer?.text || '';
     return `
         <div class="exercise-question">
             <h3>${exercise.instruction}</h3>
-           <textarea class="textarea-input" id="answerInput" placeholder="Type your answer here" ${answered ? 'disabled' : ''} onkeypress="if(event.ctrlKey && event.key==='Enter' && !this.disabled) app.submitAnswer()"></textarea>
+            <textarea class="textarea-input" id="answerInput" placeholder="Type your answer here" ${answered ? 'disabled' : ''} onkeypress="if(event.ctrlKey && event.key==='Enter' && !this.disabled) app.submitAnswer()">${textValue}</textarea>
             <button class="submit-btn" onclick="app.submitAnswer()" style="margin-top: 15px;" ${answered ? 'disabled' : ''}>Submit Answer</button>
         </div>
     `;
@@ -296,7 +296,7 @@ renderRephrasing(exercise, currentAnswer) {
             ${this.renderHeader(true)}
             <main>
                 <div class="results-screen">
-                    <<div class="results-header">
+                    <div class="results-header">
    			 <h1>${passed ? '🎉 Congratulations!' : 'Results'}</h1>
    			 <div class="student-header">
    		     <div class="student-name">${this.state.student.firstName} ${this.state.student.lastName}</div>
@@ -434,11 +434,11 @@ renderRephrasing(exercise, currentAnswer) {
     newAnswers[questionIndex] = { text: answer, correct: isCorrect };
 
     this.state.answers = newAnswers;
-    
+
     // Deshabilitar el botón Submit
     const submitBtn = document.querySelector('.submit-btn');
     if (submitBtn) submitBtn.disabled = true;
-    
+
     this.showFeedback(isCorrect, currentExercise, answer);
 }
 
@@ -532,13 +532,13 @@ renderRephrasing(exercise, currentAnswer) {
     renderPreviousFeedback() {
     const currentAnswer = this.state.answers[this.state.currentQuestion];
     const currentExercise = this.getCurrentExercise();
-    
+
     if (!currentAnswer) {
         return '';
     }
-    
+
     const feedback = this.generateFeedback(currentAnswer.correct, currentExercise, currentAnswer.text);
-    
+
     return `
         <div class="feedback show ${currentAnswer.correct ? 'correct' : 'incorrect'}">
             <div class="feedback-header">
@@ -554,7 +554,7 @@ renderRephrasing(exercise, currentAnswer) {
     `;
 }
 
-	
+
     generateFeedback(isCorrect, exercise, answer) {
         if (isCorrect) {
             return 'Great job! Your answer is correct.';
@@ -607,12 +607,10 @@ renderRephrasing(exercise, currentAnswer) {
 
 	getFirstUnansweredInSection(start, end) {
     for (let i = start; i < end; i++) {
-        // Si no hay respuesta, o la respuesta es incorrecta, retorna ese índice
         if (!this.state.answers[i] || !this.state.answers[i].correct) {
             return i;
         }
     }
-    // Si todo está respondido, retorna el último de la sección
     return end - 1;
 	}
 
@@ -620,10 +618,8 @@ renderRephrasing(exercise, currentAnswer) {
         this.setState({ currentQuestion: questionIndex });
     }
 
-
 	previousQuestion() {
     if (this.state.currentQuestion > 0) {
-        // Primero actualizar el estado y marcar que venimos de previous
         this.setState({ 
             currentQuestion: this.state.currentQuestion - 1,
             showPreviousFeedback: true
@@ -651,9 +647,6 @@ nextQuestion() {
         this.setState({ currentScreen: 'results' });
     }
 }
-
-
-
 
     tryAgain() {
         this.setState({
