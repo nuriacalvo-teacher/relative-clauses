@@ -58,12 +58,15 @@ class RelativeClausesApp {
     }
 
     renderHeader(showNav = false) {
-        if (!showNav) return '';
+    if (!showNav) return '';
 
-        return `
-            <header>
-                <div class="header-title">Relative Clauses</div>
-                <div class="nav-buttons">
+    return `
+        <header>
+            <div class="header-title">Relative Clauses</div>
+            <div class="student-info-header">
+                <span>${this.state.student.firstName} ${this.state.student.lastName}</span> - <span>${this.state.student.course}</span>
+            </div>
+            <div class="nav-buttons">
                     <button class="nav-btn nav-btn-home" onclick="app.goHome()">🏠 Home</button>
                     ${this.state.currentScreen !== 'theory' ? '<button class="nav-btn nav-btn-theory" onclick="app.goToTheory()">📖 Theory</button>' : ''}
                     ${this.state.currentScreen !== 'exercises' ? '<button class="nav-btn nav-btn-exercises" onclick="app.goToExercises()">✏️ Exercises</button>' : ''}
@@ -275,11 +278,13 @@ class RelativeClausesApp {
             ${this.renderHeader(true)}
             <main>
                 <div class="results-screen">
-                    <div class="results-header">
-                        <h1>${passed ? '🎉 Congratulations!' : 'Results'}</h1>
-                        <div class="student-info">${this.state.student.firstName} ${this.state.student.lastName}</div>
-                        <div class="student-info">${this.state.student.course}</div>
-                    </div>
+                    <<div class="results-header">
+   			 <h1>${passed ? '🎉 Congratulations!' : 'Results'}</h1>
+   			 <div class="student-header">
+   		     <div class="student-name">${this.state.student.firstName} ${this.state.student.lastName}</div>
+    		    <div class="student-course">${this.state.student.course}</div>
+   		 </div>
+		</div>
 
                     <div class="results-scores">
                         <div class="score-section ${mcPercent >= 90 ? 'passing' : 'failing'}">
@@ -414,29 +419,39 @@ class RelativeClausesApp {
         this.showFeedback(isCorrect, currentExercise, answer);
     }
 
-    checkAnswer(answer, exercise) {
-        if (this.state.currentQuestion < 10) {
-            return exercise.correct.includes(answer);
-        } else if (this.state.currentQuestion < 30) {
-            const normalized = this.normalizeAnswer(answer);
-            return exercise.correct.some(correct => 
-                this.normalizeAnswer(correct) === normalized
-            );
-        } else {
-            const normalized = this.normalizeAnswer(answer);
-            return exercise.correct.some(correct => 
-                this.normalizeAnswer(correct) === normalized ||
-                this.fuzzyMatch(normalized, this.normalizeAnswer(correct))
-            );
-        }
-    }
+        checkAnswer(answer, exercise) {
+       	 if (this.state.currentQuestion < 10) {
+       	 return exercise.correct.includes(answer);
+    	 } else if (this.state.currentQuestion < 30) {
+        	const normalized = this.normalizeAnswer(answer);
+        	return exercise.correct.some(correct => 
+           	 this.normalizeAnswer(correct) === normalized
+        	);
+ 	   } else {
+     	   // Rephrasing: preserve commas in validation
+     	   const normalized = this.normalizeAnswerRephrasing(answer);
+    	    return exercise.correct.some(correct => 
+    	        this.normalizeAnswerRephrasing(correct) === normalized
+   	     );
+ 	   }
+	}
 
-    normalizeAnswer(text) {
-        return text.toLowerCase()
-            .replace(/[^a-z0-9 ]/g, '')
-            .trim()
-            .replace(/  +/g, ' ');
-    }
+	normalizeAnswer(text) {
+   	 return text.toLowerCase()
+    	    .replace(/[^a-z0-9 ]/g, '')
+    	    .trim()
+     	   .replace(/  +/g, ' ');
+	}
+	normalizeAnswerRephrasing(text) {
+    // For rephrasing: keep commas but remove final punctuation
+    return text.toLowerCase()
+        .replace(/[.!?;:]+$/, '')
+        .replace(/[^a-z0-9 ,]/g, '')
+        .trim()
+        .replace(/  +/g, ' ')
+        .replace(/ +, +/g, ', ')
+        .replace(/, +/g, ', ');
+}
 
     fuzzyMatch(answer, correct) {
         const answerWords = answer.split(' ').filter(w => w);
