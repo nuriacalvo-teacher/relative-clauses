@@ -261,7 +261,7 @@ renderFillInTheGaps(exercise, currentAnswer) {
     return `
         <div class="exercise-question">
             <h3>${exercise.sentence}</h3>
-            <input type="text" class="fill-input" id="answerInput" value="${currentAnswer?.text || ''}" placeholder="Type your answer here" ${answered ? 'disabled' : ''}>
+            <input type="text" class="fill-input" id="answerInput" value="${currentAnswer?.text || ''}" placeholder="Type your answer here" ${answered ? 'disabled' : ''} onkeypress="if(event.key==='Enter' && !this.disabled) app.submitAnswer()">
             <button class="submit-btn" onclick="app.submitAnswer()" style="margin-top: 15px;" ${answered ? 'disabled' : ''}>Submit Answer</button>
         </div>
     `;
@@ -272,7 +272,7 @@ renderRephrasing(exercise, currentAnswer) {
     return `
         <div class="exercise-question">
             <h3>${exercise.instruction}</h3>
-            <textarea class="textarea-input" id="answerInput" placeholder="Type your answer here" ${answered ? 'disabled' : ''}>${currentAnswer?.text || ''}</textarea>
+           <textarea class="textarea-input" id="answerInput" placeholder="Type your answer here" ${answered ? 'disabled' : ''} onkeypress="if(event.ctrlKey && event.key==='Enter' && !this.disabled) app.submitAnswer()"></textarea>
             <button class="submit-btn" onclick="app.submitAnswer()" style="margin-top: 15px;" ${answered ? 'disabled' : ''}>Submit Answer</button>
         </div>
     `;
@@ -633,14 +633,25 @@ renderRephrasing(exercise, currentAnswer) {
 
 nextQuestion() {
     if (this.state.currentQuestion < 49) {
-        this.setState({ 
-            currentQuestion: this.state.currentQuestion + 1,
-            showPreviousFeedback: false
-        });
+        let nextQuestion = this.state.currentQuestion + 1;
+        // Si la siguiente pregunta ya está respondida, salta a la siguiente sin responder
+        while (nextQuestion < 50 && this.state.answers[nextQuestion] !== undefined) {
+            nextQuestion++;
+        }
+        // Si llegó al final, ir a resultados
+        if (nextQuestion >= 50) {
+            this.setState({ currentScreen: 'results' });
+        } else {
+            this.setState({ 
+                currentQuestion: nextQuestion,
+                showPreviousFeedback: false
+            });
+        }
     } else {
         this.setState({ currentScreen: 'results' });
     }
 }
+
 
 
 
