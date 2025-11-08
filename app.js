@@ -643,50 +643,51 @@ renderRephrasing(exercise, currentAnswer) {
     }
 
     loadLeaderboard() {
-    // Cargar desde Google Sheets SIN hacer render() aquí
+    // Usar localStorage primero (instantáneo)
+    const saved = localStorage.getItem('leaderboard');
+    if (saved) {
+        this.state.leaderboard = JSON.parse(saved);
+    }
+
+    // Intentar cargar de Google Sheets en segundo plano (sin bloquear)
     fetch(GOOGLE_SHEETS_URL)
         .then(res => res.json())
         .then(data => {
             if (data && data.length > 0) {
-                this.state.leaderboard = data.sort((a, b) => b.score - a.score || a.timeSpent - b.timeSpent).slice(0, 10);
+                this.state.leaderboard = data;
             }
         })
-        .catch(err => {
-            console.log('Google Sheets no disponible, usando local');
-            const saved = localStorage.getItem('leaderboard');
-            this.state.leaderboard = saved ? JSON.parse(saved) : [];
-        });
+        .catch(() => {});
 }
 
 
-    saveToLeaderboard(totalScore, timeSpent) {
-        const newEntry = {
-            firstName: this.state.student.firstName,
-            lastName: this.state.student.lastName,
-            course: this.state.student.course,
-            score: totalScore,
-            timeSpent: timeSpent,
-            date: new Date().toLocaleDateString()
-        };
 
-        // Enviar a Google Sheets
-        fetch(GOOGLE_SHEETS_URL, {
-            method: 'POST',
-            body: JSON.stringify(newEntry)
-        }).then(() => {
-            console.log('Resultado guardado en Google Sheets');
-            // Recargar leaderboard
-            setTimeout(() => this.loadLeaderboard(), 500);
-        }).catch(err => {
-            console.log('Error al guardar en Google Sheets, usando local');
-            // Guardar localmente como respaldo
-            const leaderboard = [...this.state.leaderboard, newEntry]
-                .sort((a, b) => b.score - a.score || a.timeSpent - b.timeSpent)
-                .slice(0, 10);
-            this.state.leaderboard = leaderboard;
-            localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
-        });
-    }
+saveToLeaderboard(totalScore, timeSpent) {
+    const newEntry = {
+        firstName: this.state.student.firstName,
+        lastName: this.state.student.lastName,
+        course: this.state.student.course,
+        score: totalScore,
+        timeSpent: timeSpent,
+        date: new Date().toLocaleDateString()
+    };
+
+    // Guardar SIEMPRE localmente
+    const leaderboard = [...this.state.leaderboard, newEntry]
+        .sort((a, b) => b.score - a.score || a.timeSpent - b.timeSpent)
+        .slice(0, 10);
+    
+    this.state.leaderboard = leaderboard;
+    localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
+
+    // Enviar a Google Sheets en segundo plano (sin bloquear)
+    fetch(GOOGLE_SHEETS_URL, {
+        method: 'POST',
+        body: JSON.stringify(newEntry),
+        mode: 'no-cors'
+    }).catch(() => console.log('Google Sheets enviado'));
+}
+
 
     showLeaderboard() {
 		this.loadLeaderboard();  // Carga aquí
