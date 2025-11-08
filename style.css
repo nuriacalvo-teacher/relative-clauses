@@ -171,14 +171,14 @@ main {
 }
 
 .menu-screen h1 {
-    color: #1e3a8a;
+    color: #FFF;
     margin-bottom: 20px;
     font-size: 36px;
 }
 
 .welcome-message {
     font-size: 18px;
-    color: #6b7280;
+    color: #d7e0fc;
     margin-bottom: 50px;
 }
 
@@ -338,11 +338,11 @@ main {
 
 .exercise-navigation {
     display: flex;
-    gap: 10px;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
+    justify-content: center; /* Centra horizontalmente */
+    gap: 15px; /* Espacio entre botones */
+    flex-wrap: wrap; /* Para que los botones se muevan en móviles */
+    margin: 20px 0; /* Espaciado arriba y abajo */
 }
-
 .jump-link {
     padding: 10px 15px;
     background: #e5e7eb;
@@ -353,6 +353,8 @@ main {
     font-weight: bold;
     transition: all 0.3s ease;
     color: #1f2937;
+    text-align: center;
+    min-width: 150px; /* Opcional, para ancho mínimo en móviles */
 }
 
 .jump-link:hover {
