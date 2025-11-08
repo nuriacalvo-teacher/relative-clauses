@@ -234,38 +234,41 @@ class RelativeClausesApp {
     }
 
 	renderMultipleChoice(exercise, currentAnswer) {
+    const answered = this.state.answers[this.state.currentQuestion] !== undefined;
     return `
         <div class="exercise-question">
             <h3>${exercise.question}</h3>
             <div class="exercise-options">
                 ${exercise.options.map((option, idx) => `
                     <label class="option ${currentAnswer === option ? 'selected' : ''}">
-                        <input type="radio" name="answer" value="${option}" ${currentAnswer === option ? 'checked' : ''} ${currentAnswer?.correct !== undefined ? 'disabled' : ''}>
+                        <input type="radio" name="answer" value="${option}" ${currentAnswer === option ? 'checked' : ''} ${answered ? 'disabled' : ''}>
                         <span>${option}</span>
                     </label>
                 `).join('')}
             </div>
-            <button class="submit-btn" onclick="app.submitAnswer()" ${currentAnswer?.correct !== undefined ? 'disabled' : ''}>Submit Answer</button>
-        </div>
-    `;
-	}
-
-
-    renderFillInTheGaps(exercise, currentAnswer) {
-    return `
-        <div class="exercise-question">
-            <h3>${exercise.sentence}</h3>
-            <input type="text" class="fill-input" id="answerInput" value="${currentAnswer?.text || ''}" placeholder="Type your answer here" ${currentAnswer?.correct !== undefined ? 'disabled' : ''}>
-            <button class="submit-btn" onclick="app.submitAnswer()" style="margin-top: 15px;" ${currentAnswer?.correct !== undefined ? 'disabled' : ''}>Submit Answer</button>
+            <button class="submit-btn" onclick="app.submitAnswer()" ${answered ? 'disabled' : ''}>Submit Answer</button>
         </div>
     `;
 }
-    renderRephrasing(exercise, currentAnswer) {
+
+renderFillInTheGaps(exercise, currentAnswer) {
+    const answered = this.state.answers[this.state.currentQuestion] !== undefined;
+    return `
+        <div class="exercise-question">
+            <h3>${exercise.sentence}</h3>
+            <input type="text" class="fill-input" id="answerInput" value="${currentAnswer?.text || ''}" placeholder="Type your answer here" ${answered ? 'disabled' : ''}>
+            <button class="submit-btn" onclick="app.submitAnswer()" style="margin-top: 15px;" ${answered ? 'disabled' : ''}>Submit Answer</button>
+        </div>
+    `;
+}
+
+renderRephrasing(exercise, currentAnswer) {
+    const answered = this.state.answers[this.state.currentQuestion] !== undefined;
     return `
         <div class="exercise-question">
             <h3>${exercise.instruction}</h3>
-            <textarea class="textarea-input" id="answerInput" placeholder="Type your answer here" ${currentAnswer?.correct !== undefined ? 'disabled' : ''}>${currentAnswer?.text || ''}</textarea>
-            <button class="submit-btn" onclick="app.submitAnswer()" style="margin-top: 15px;" ${currentAnswer?.correct !== undefined ? 'disabled' : ''}>Submit Answer</button>
+            <textarea class="textarea-input" id="answerInput" placeholder="Type your answer here" ${answered ? 'disabled' : ''}>${currentAnswer?.text || ''}</textarea>
+            <button class="submit-btn" onclick="app.submitAnswer()" style="margin-top: 15px;" ${answered ? 'disabled' : ''}>Submit Answer</button>
         </div>
     `;
 }
