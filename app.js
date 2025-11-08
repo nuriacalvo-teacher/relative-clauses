@@ -32,7 +32,6 @@ class RelativeClausesApp {
 
     init() {
   	  this.shuffleExercises();
-          this.loadLeaderboard();
           this.render();
 }
 
@@ -644,23 +643,21 @@ renderRephrasing(exercise, currentAnswer) {
     }
 
     loadLeaderboard() {
-        // Cargar desde Google Sheets
-        fetch(GOOGLE_SHEETS_URL)
-            .then(res => res.json())
-            .then(data => {
-                if (data && data.length > 0) {
-                    this.state.leaderboard = data.sort((a, b) => b.score - a.score || a.timeSpent - b.timeSpent).slice(0, 10);
-                }
-                this.render();
-            })
-            .catch(err => {
-                console.log('Google Sheets no disponible, usando local');
-                // Si falla, usar localStorage como respaldo
-                const saved = localStorage.getItem('leaderboard');
-                this.state.leaderboard = saved ? JSON.parse(saved) : [];
-                this.render();
-            });
-    }
+    // Cargar desde Google Sheets SIN hacer render() aquí
+    fetch(GOOGLE_SHEETS_URL)
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.length > 0) {
+                this.state.leaderboard = data.sort((a, b) => b.score - a.score || a.timeSpent - b.timeSpent).slice(0, 10);
+            }
+        })
+        .catch(err => {
+            console.log('Google Sheets no disponible, usando local');
+            const saved = localStorage.getItem('leaderboard');
+            this.state.leaderboard = saved ? JSON.parse(saved) : [];
+        });
+}
+
 
     saveToLeaderboard(totalScore, timeSpent) {
         const newEntry = {
@@ -692,6 +689,7 @@ renderRephrasing(exercise, currentAnswer) {
     }
 
     showLeaderboard() {
+		this.loadLeaderboard();  // Carga aquí
         this.setState({ currentScreen: 'leaderboard' });
     }
 
