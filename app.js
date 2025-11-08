@@ -589,30 +589,44 @@ renderRephrasing(exercise, currentAnswer) {
         this.setState({ currentQuestion: questionIndex });
     }
 
-    previousQuestion() {
+
+	previousQuestion() {
     if (this.state.currentQuestion > 0) {
-        // Deshabilitar el botón Submit cuando volvemos atrás
+        this.setState({ currentQuestion: this.state.currentQuestion - 1 });
+        // Mostrar corrección y deshabilitar Inputs al volver atrás
         setTimeout(() => {
             const submitBtn = document.querySelector('.submit-btn');
             if (submitBtn) submitBtn.disabled = true;
+
+            // Mostrar el feedback de la respuesta guardada
+            const idx = this.state.currentQuestion;
+            const currentAnswer = this.state.answers[idx];
+            const currentExercise = this.getCurrentExercise();
+            if (currentAnswer) {
+                this.showFeedback(currentAnswer.correct, currentExercise, currentAnswer.text);
+            } else {
+                const feedbackContainer = document.getElementById('feedbackContainer');
+                if (feedbackContainer) feedbackContainer.innerHTML = '';
+            }
         }, 0);
-        this.setState({ currentQuestion: this.state.currentQuestion - 1 });
     }
 }
 
-
-    nextQuestion() {
+nextQuestion() {
     if (this.state.currentQuestion < 49) {
         this.setState({ currentQuestion: this.state.currentQuestion + 1 });
-        // Habilitar el botón Submit para la siguiente pregunta
+        // Habilitar input y botón para nueva pregunta, limpiar feedback
         setTimeout(() => {
             const submitBtn = document.querySelector('.submit-btn');
             if (submitBtn) submitBtn.disabled = false;
+            const feedbackContainer = document.getElementById('feedbackContainer');
+            if (feedbackContainer) feedbackContainer.innerHTML = '';
         }, 0);
     } else {
         this.setState({ currentScreen: 'results' });
     }
 }
+
 
     tryAgain() {
         this.setState({
