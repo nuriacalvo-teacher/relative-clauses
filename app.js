@@ -413,24 +413,30 @@ renderRephrasing(exercise, currentAnswer) {
     attachResultsListeners() {}
 
     submitAnswer() {
-        const questionIndex = this.state.currentQuestion;
-        const currentExercise = this.getCurrentExercise();
-        let answer;
+    const questionIndex = this.state.currentQuestion;
+    const currentExercise = this.getCurrentExercise();
+    let answer;
 
-        if (questionIndex < 10) {
-            const selected = document.querySelector('input[name="answer"]:checked');
-            answer = selected ? selected.value : '';
-        } else {
-            answer = document.getElementById('answerInput').value.trim();
-        }
-
-        const isCorrect = this.checkAnswer(answer, currentExercise);
-        const newAnswers = [...this.state.answers];
-        newAnswers[questionIndex] = { text: answer, correct: isCorrect };
-
-        this.state.answers = newAnswers;
-        this.showFeedback(isCorrect, currentExercise, answer);
+    if (questionIndex < 10) {
+        const selected = document.querySelector('input[name="answer"]:checked');
+        answer = selected ? selected.value : '';
+    } else {
+        answer = document.getElementById('answerInput').value.trim();
     }
+
+    const isCorrect = this.checkAnswer(answer, currentExercise);
+    const newAnswers = [...this.state.answers];
+    newAnswers[questionIndex] = { text: answer, correct: isCorrect };
+
+    this.state.answers = newAnswers;
+    
+    // Deshabilitar el botón Submit
+    const submitBtn = document.querySelector('.submit-btn');
+    if (submitBtn) submitBtn.disabled = true;
+    
+    this.showFeedback(isCorrect, currentExercise, answer);
+}
+
 
         checkAnswer(answer, exercise) {
        	 if (this.state.currentQuestion < 10) {
@@ -584,18 +590,29 @@ renderRephrasing(exercise, currentAnswer) {
     }
 
     previousQuestion() {
-        if (this.state.currentQuestion > 0) {
-            this.setState({ currentQuestion: this.state.currentQuestion - 1 });
-        }
+    if (this.state.currentQuestion > 0) {
+        // Deshabilitar el botón Submit cuando volvemos atrás
+        setTimeout(() => {
+            const submitBtn = document.querySelector('.submit-btn');
+            if (submitBtn) submitBtn.disabled = true;
+        }, 0);
+        this.setState({ currentQuestion: this.state.currentQuestion - 1 });
     }
+}
+
 
     nextQuestion() {
-        if (this.state.currentQuestion < 49) {
-            this.setState({ currentQuestion: this.state.currentQuestion + 1 });
-        } else {
-            this.setState({ currentScreen: 'results' });
-        }
+    if (this.state.currentQuestion < 49) {
+        this.setState({ currentQuestion: this.state.currentQuestion + 1 });
+        // Habilitar el botón Submit para la siguiente pregunta
+        setTimeout(() => {
+            const submitBtn = document.querySelector('.submit-btn');
+            if (submitBtn) submitBtn.disabled = false;
+        }, 0);
+    } else {
+        this.setState({ currentScreen: 'results' });
     }
+}
 
     tryAgain() {
         this.setState({
