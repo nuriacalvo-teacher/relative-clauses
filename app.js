@@ -427,7 +427,7 @@ renderRephrasing(exercise, currentAnswer) {
                             </thead>
                             <tbody>
                                 ${entries.map((entry, idx) => `
-                                    <tr style="border-bottom: 1px solid #ddd; ${idx % 2 === 0 ? 'background-color: #f9f9f9;' : ''}">
+                                    <tr style="border-bottom: 1px solid #ddd; ${idx % 2 === 0 ? 'background-color: #f9f9f9;' : 'background-color: #eef6fb;'}">
                                         <td style="padding: 12px; font-weight: bold;">
                                             ${idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : ''}
                                             #${idx + 1}
