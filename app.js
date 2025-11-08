@@ -22,8 +22,10 @@ class RelativeClausesApp {
     }
 
     init() {
-        this.render();
-    }
+  	  this.shuffleExercises();
+          this.render();
+}
+
 
     setState(newState) {
         this.state = { ...this.state, ...newState };
@@ -453,6 +455,23 @@ class RelativeClausesApp {
         .replace(/, +/g, ', ');
 }
 
+	shuffleArray(array) {
+   	  const shuffled = [...array];
+  	  for (let i = shuffled.length - 1; i > 0; i--) {
+  	  	const j = Math.floor(Math.random() * (i + 1));
+  	  	[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    	  }
+    	  return shuffled;
+	}
+
+	shuffleExercises() {
+ 	   const mc = this.shuffleArray(exercisesData.slice(0, 10));
+ 	   const fg = this.shuffleArray(exercisesData.slice(10, 30));
+	    const rp = this.shuffleArray(exercisesData.slice(30, 50));
+	    this.shuffledExercises = [...mc, ...fg, ...rp];
+	}
+
+
     fuzzyMatch(answer, correct) {
         const answerWords = answer.split(' ').filter(w => w);
         const correctWords = correct.split(' ').filter(w => w);
@@ -522,8 +541,9 @@ class RelativeClausesApp {
     }
 
     getCurrentExercise() {
-        return exercisesData[this.state.currentQuestion];
+    return this.shuffledExercises[this.state.currentQuestion];
     }
+
 
     goHome() {
         this.setState({ currentScreen: 'menu' });
