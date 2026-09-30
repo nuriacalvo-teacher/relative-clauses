@@ -1,169 +1,54 @@
-# Relative Clauses - Interactive Learning App
+# Relative Clauses · EnglishPRO
 
-Una aplicación educativa interactiva para aprender y practicar oraciones de relativo en inglés.
+App de práctica de las **oraciones de relativo** en inglés (ESO / Bachillerato), hecha con el mismo motor y el mismo sistema de corrección que [past-tenses](https://github.com/nuriacalvo-teacher/past-tenses).
 
-## 🎯 Características
+**8 módulos × 3 niveles, con 10 ejercicios por nivel (240 en total):**
 
-- ✅ 50 ejercicios autocorregibles
-  - 10 Multiple Choice
-  - 20 Fill-in-the-Gaps
-  - 20 Rephrasing
-- 📚 Teoría completa sobre relative clauses
-- 📊 Sistema de puntuación parcial por secciones
-- 🎓 Requisito de 90% en cada sección para aprobar
-- ⚡ Feedback inmediato para cada ejercicio
-- 📈 Panel de puntuación en tiempo real
-- 🔄 Navegación fluida sin perder datos
-- 📱 Diseño responsivo (móvil y desktop)
+1. Relative Pronouns (who, which, that, whose, where, when, why, whom, what)
+2. Defining Relative Clauses (sin comas, *that*, omisión del pronombre)
+3. Non-defining Relative Clauses (comas, nunca *that*, *which* = lo cual)
+4. Defining vs Non-defining (las comas cambian el significado)
+5. Prepositions, whom & quantifiers (*the man to whom…*, *some of which*, *what*)
+6. Reduced Relative Clauses (*the girl sitting…*, *a book written by…*, *the first to arrive*)
+7. Rephrasing (unir dos frases con un relativo)
+8. Review of Relative Clauses
 
-## 🚀 Cómo usar
+- **Level 1:** opción múltiple (hace falta un 90 % para aprobar)
+- **Level 2:** rellenar huecos (80 %)
+- **Level 3:** traducción del español al inglés (80 %). En el módulo 7 se unen dos frases en inglés con la palabra que va entre paréntesis.
 
-1. Abre `index.html` en tu navegador
-2. Ingresa tu nombre, apellido y curso
-3. Estudia la teoría o comienza con los ejercicios
-4. Los datos se guardan en memoria durante la sesión
-5. Al terminar, verás tu puntuación final
+En **cada lista de 10 ejercicios** hay 5 frases afirmativas (50 %), 3 preguntas (30 %) y 2 negativas (20 %). Los ejemplos de la teoría siguen el mismo reparto.
 
-## 📁 Estructura del proyecto
+Cada módulo empieza con una explicación en español y ejemplos. Los alumnos pueden entrar con su cuenta de Google y el código de clase, o como invitados (en ese caso no se guarda nada).
+
+## Corrección
+
+- **Level 2:** si valen varios pronombres (*who / that*, *which / that*, *where / in which*), se acepta cualquiera que sea correcto. Las contracciones y las mayúsculas no cuentan.
+- **Level 3:** igual que en past-tenses, se aceptan todas las respuestas correctas, no solo la del modelo:
+  - *who* o *that* cuando valen los dos, y la omisión del pronombre cuando es objeto de una defining
+  - la preposición al final o delante (*the girl I spoke to* / *the girl to whom I spoke*)
+  - sinónimos (mum/mother, film/movie, shop/store, grandma/grandmother…), ortografía británica y americana, contracciones y números en cifra o en letra
+  - *he* o *she* cuando la frase en español no lleva sujeto
+- Se marcan como error: *which* para personas, *that* o la falta de pronombre en una non-defining, repetir el pronombre (*the book which I read it*), *what* detrás de un nombre, etc.
+- ⚠️ El corrector ignora la puntuación, así que **las comas no se corrigen en el nivel 3** (sí en los niveles 1 y 2). La teoría y las instrucciones avisan de que en los exámenes sí cuentan.
+
+Si hay que añadir una alternativa, se escribe en el campo `pat` de la frase: `(a|b)` = vale a o b, `[x]` = opcional, `@grupo` = grupo de sinónimos.
+
+## Tests
 
 ```
-relative-clauses-app/
-├── index.html          # Estructura HTML principal
-├── style.css           # Estilos CSS (diseño responsivo)
-├── app.js              # Lógica principal de la aplicación
-├── data.js             # Contenido de teoría y ejercicios
-├── README.md           # Este archivo
-└── .gitignore          # Archivos a ignorar en Git
+node tests/level3.test.js    # corrector del nivel 3: 80 frases, respuestas buenas y malas
+node tests/content.test.js   # 10 ejercicios por nivel y reparto 50/30/20
 ```
 
-## 🌐 Requisitos
+## ⚠️ Firebase: hay que hacer una cosa una sola vez
 
-- Navegador moderno (Chrome, Firefox, Safari, Edge)
-- No requiere servidor ni instalación
-- No requiere conexión a internet después de cargar
+Esta app guarda los resultados en su propio nodo, **`relative_clauses_v1`** (el de past-tenses es `past_tenses_v1`), para que las notas de las apps no se mezclen.
 
-## 📖 Contenido del App
+En la consola de Firebase (proyecto *goya-english*): Realtime Database → **Reglas**. Duplica el bloque de `past_tenses_v1`, cambia el nombre a `relative_clauses_v1` y publica.
 
-### Pantalla de Login
-- Entrada de nombre, apellido y curso
-- Validación de datos
+Hasta que no lo hagas, el modo invitado funciona, pero la entrada con código de clase mostrará "Wrong class code".
 
-### Menú Principal
-- Acceso a Teoría
-- Acceso a Ejercicios
-- Navegación fluida
+## Publicarla
 
-### Sección de Teoría
-- Introducción a Relative Clauses
-- Defining vs Non-Defining Clauses
-- Relative Pronouns (who, which, that, whose, whom)
-- Relative Adverbs (when, where, why)
-- Explicaciones en inglés con traducciones al español
-- Ejemplos prácticos
-
-### Sección de Ejercicios
-- **Multiple Choice**: 10 ejercicios con 4 opciones cada uno
-- **Fill-in-the-Gaps**: 20 ejercicios para completar
-- **Rephrasing**: 20 ejercicios de combinación de oraciones
-- Navegación rápida entre secciones
-- Panel de puntuación en tiempo real
-- Feedback inmediato (correcto/incorrecto)
-- Explicaciones detalladas
-- Botones para navegar anterior/siguiente
-
-### Sección de Resultados
-- Puntuaciones parciales por sección:
-  - Multiple Choice: /20
-  - Fill-in-the-Gaps: /40
-  - Rephrasing: /40
-- Puntuación total: /100
-- Porcentajes por sección
-- Indicadores visuales (✓/✗)
-- Mensaje de aprobación o recomendación
-- Opciones para repetir o volver al menú
-
-## 🔧 Sistemas de Corrección
-
-### Multiple Choice
-- Comparación directa con respuesta correcta
-- Aceptación de múltiples variantes válidas
-
-### Fill-in-the-Gaps
-- Normalización de respuestas (minúsculas, sin puntuación)
-- Aceptación de múltiples respuestas correctas
-- Tolerancia con espacios y caracteres especiales
-
-### Rephrasing
-- Comparación flexible de estructuras
-- Normalización completa de texto
-- Aceptación de múltiples formas válidas
-- Fuzzy matching para respuestas equivalentes
-
-## 📊 Sistema de Puntuación
-
-### Cálculo de Puntos
-- Cada ejercicio = 2 puntos
-- Total = 100 puntos
-
-### Requisito de Aprobación
-- **OBLIGATORIO 90% en CADA sección**:
-  - Multiple Choice: ≥ 18/20 (90%)
-  - Fill-in-the-Gaps: ≥ 36/40 (90%)
-  - Rephrasing: ≥ 36/40 (90%)
-- El alumno aprueba SOLO si cumple con las tres condiciones
-
-## 🎨 Diseño
-
-- Interfaz moderna y limpia
-- Colores profesionales
-  - Azul marino: principal (#1e3a8a)
-  - Verde: teoría (#10b981)
-  - Naranja: ejercicios (#f97316)
-  - Amarillo: home (#fbbf24)
-- Responsive design
-- Tipografía clara y legible
-- Animaciones suaves
-- Contraste adecuado para accesibilidad
-
-## 🚀 Despliegue en GitHub Pages
-
-1. Sube este repositorio a GitHub
-2. Ve a Settings → Pages
-3. Selecciona Branch: main
-4. Tu app estará en: `https://tu-usuario.github.io/relative-clauses-app/`
-
-## 💾 Almacenamiento de Datos
-
-- Los datos se guardan **en memoria** durante la sesión
-- **NO usa localStorage**, cookies ni base de datos
-- Los datos se pierden al cerrar el navegador (comportamiento intencional)
-- Cada nuevo login inicia una nueva sesión limpia
-
-## 📝 Notas de Desarrollo
-
-- Aplicación vanilla JavaScript (sin frameworks)
-- Single Page Application (SPA)
-- CSS Grid y Flexbox para layout responsivo
-- Gestión de estado local
-- Funcionalidad completa sin dependencias externas
-
-## 👨‍🏫 Para Docentes
-
-Esta aplicación es ideal para:
-- Enseñanza de gramática inglesa
-- Evaluación formativa
-- Autoaprendizaje de estudiantes
-- Práctica de relative clauses
-- Seguimiento de progreso
-
-## 📄 Licencia
-
-Libre para uso educativo
-
-## 👤 Autor
-
-Creado para estudiantes de ESO y Bachillerato
-
----
-
-**¿Preguntas o sugerencias?** Siéntete libre de crear un issue en el repositorio.
+Settings → Pages → Deploy from a branch → `main` / root.
